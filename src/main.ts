@@ -1,30 +1,27 @@
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
+import { config as loadEnv } from 'dotenv';
 
-import app from './app';
-import corsOptions from './corsOptions';
+import ChatMessage from './types/ChatMessage';
 
-const httpServer = createServer(app);
+loadEnv();
+
+const httpServer = createServer();
 const io = new Server(httpServer, {
-  cors: corsOptions
+  cors: {
+    origin: process.env.ORIGIN_URL,
+    credentials: true
+  }
 });
 
 io.on('connection', (socket: Socket) => {
-  socket.on('enterLobbies', (rooms: string[]) => {
-    socket.join(rooms);
-  });
+  socket.on('joinRoom', (room: string) => socket.join(room));
 
-  socket.on('createRoom', (language: string) => {
-    const langaugeLobbyRooms = [...socket.rooms].filter(
-      (roomName) => roomName !== socket.id
-    );
+  socket.on('leaveRoom', (room: string) => socket.leave(room));
 
-    for (const room of langaugeLobbyRooms) {
-      socket.leave(room);
-    }
-
-    socket.to(language).emit('newRoomAvailable');
-  });
+  socket.on('incomingChatMessage', (roomId: string, message: ChatMessage) =>
+    socket.to(roomId).emit('newChatMessage', message)
+  );
 });
 
 httpServer.listen(process.env.PORT);
