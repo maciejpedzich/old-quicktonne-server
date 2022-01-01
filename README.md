@@ -1,3 +1,7 @@
+# ARCHIVE NOTE
+
+This is an old version of an auxilary Socket.io server for an equally old version of Quicktonne. See: [quicktonne](https://github.com/maciejpedzich/quicktonne) repository for the latest version of this app.
+
 # quicktonne-server
 
 Backend (more specifically - a WebSocket server) for the Quicktonne app.
